@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة رياض الأطفال - Little Stars</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>">
+</head>
+<body class="light-mode">
+    <!-- شريط التنقل العلوي -->
+    <nav class="main-nav">
+        <div class="nav-brand">
+            <h1 class="brand-name">Little Stars</h1>
+        </div>
+        <div class="nav-links">
+            <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">
+                <i class="fas fa-home"></i> الرئيسية
+            </a>
+            <a href="#children" class="nav-link" onclick="showSection('children')">
+                <i class="fas fa-child"></i> الأطفال
+            </a>
+            <a href="#attendance" class="nav-link" onclick="showSection('attendance')">
+                <i class="fas fa-clipboard-check"></i> الحضور
+            </a>
+            <a href="#lessons" class="nav-link" onclick="showSection('lessons')">
+                <i class="fas fa-book-open"></i> الحصص
+            </a>
+            <a href="#teachers" class="nav-link" onclick="showSection('teachers')">
+                <i class="fas fa-chalkboard-teacher"></i> المعلمون
+            </a>
+            <a href="#reports" class="nav-link" onclick="showSection('reports')">
+                <i class="fas fa-chart-bar"></i> التقارير
+            </a>
+            <button id="themeToggle" class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- إشعارات سريعة -->
+    <div id="notification-container"></div>
+
+    <!-- الشريط الجانبي -->
+    <aside class="sidebar">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h3>المشرف العام</h3>
+            <p>admin@little-stars.com</p>
+        </div>
+        
+        <div class="quick-stats">
+            <h4><i class="fas fa-chart-line"></i> إحصائيات سريعة</h4>
+            <div class="stat-item">
+                <span>عدد الأطفال:</span>
+                <span id="sidebarChildrenCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span>الحضور اليوم:</span>
+                <span id="sidebarAttendanceToday">0%</span>
+            </div>
+            <div class="stat-item">
+                <span>الواجبات المعلقة:</span>
+                <span id="sidebarPendingHomework">0</span>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <h4><i class="fas fa-cogs"></i> إدارة النظام</h4>
+            <a href="#classes" onclick="showSection('classes')" class="sidebar-link">
+                <i class="fas fa-users"></i> الفصول الدراسية
+            </a>
+            <a href="#parents" onclick="showSection('parents')" class="sidebar-link">
+                <i class="fas fa-user-friends"></i> أولياء الأمور
+            </a>
+            <a href="#communications" onclick="showSection('communications')" class="sidebar-link">
+                <i class="fas fa-comments"></i> التواصل
+            </a>
+            <a href="#settings" onclick="showSection('settings')" class="sidebar-link">
+                <i class="fas fa-cog"></i> الإعدادات
+            </a>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content">
+        <!-- قسم لوحة التحكم -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h2>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+
+            <!-- بطاقات الإحصائيات -->
+            <div class="stats-cards">
+                <div class="stat-card card-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>إجمالي الأطفال</h3>
+                        <p id="totalChildren">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card card-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>نسبة الحضور اليوم</h3>
+                        <p id="attendanceRate">0%</p>
+                    </div>
+                </div>
+
+                <div class="stat-card card-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الحصص اليوم</h3>
+                        <p id="todayLessons">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card card-danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الغياب</h3>
+                        <p id="absentCount">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الأطفال الجديد -->
+            <div class="dashboard-section">
+                <div class="section-title">
+                    <h3><i class="fas fa-user-plus"></i> الأطفال المسجلون حديثاً</h3>
+                    <button class="btn btn-primary" onclick="showSection('children')">
+                        <i class="fas fa-plus"></i> إضافة طفل جديد
+                    </button>
+                </div>
+                <div class="children-grid" id="newChildrenCards">
+                    <!-- سيتم ملؤها بالبيانات -->
+                </div>
+            </div>
+
+            <!-- الحصص القادمة -->
+            <div class="dashboard-section">
+                <div class="section-title">
+                    <h3><i class="fas fa-calendar-alt"></i> الحصص القادمة</h3>
+                    <button class="btn btn-primary" onclick="showSection('lessons')">
+                        <i class="fas fa-eye"></i> عرض الكل
+                    </button>
+                </div>
+                <div class="lessons-grid" id="upcomingLessons">
+                    <!-- سيتم ملؤها بالبيانات -->
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الأطفال -->
+        <section id="children" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-child"></i> إدارة الأطفال</h2>
+                <button class="btn btn-success" onclick="openAddChildModal()">
+                    <i class="fas fa-plus-circle"></i> إضافة طفل جديد
+                </button>
+            </div>
+
+            <!-- فلترة البحث -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <input type="text" id="searchChildren" placeholder="بحث عن طفل..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <select id="classFilter" class="filter-select">
+                    <option value="">جميع الفصول</option>
+                    <option value="الروضة الأولى">الروضة الأولى</option>
+                    <option value="الروضة الثانية">الروضة الثانية</option>
+                    <option value="التمهيدي">التمهيدي</option>
+                </select>
+                <select id="statusFilter" class="filter-select">
+                    <option value="">جميع الحالات</option>
+                    <option value="active">نشط</option>
+                    <option value="inactive">غير نشط</option>
+                </select>
+            </div>
+
+            <!-- قائمة الأطفال -->
+            <div class="children-grid" id="childrenListContainer">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+        </section>
+
+        <!-- قسم الحضور -->
+        <section id="attendance" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-clipboard-check"></i> إدارة الحضور والغياب</h2>
+                <div class="attendance-controls">
+                    <div class="form-group" style="margin: 0;">
+                        <input type="date" id="attendanceDate" class="date-input">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <select id="attendanceClass" class="filter-select">
+                            <option value="">اختر الفصل</option>
+                            <!-- سيتم ملؤها بالبيانات -->
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="loadClassAttendance()">
+                        <i class="fas fa-sync-alt"></i> تحميل القائمة
+                    </button>
+                    <button class="btn btn-success" onclick="saveAttendance()">
+                        <i class="fas fa-save"></i> حفظ الحضور
+                    </button>
+                </div>
+            </div>
+
+            <!-- إحصائيات الحضور -->
+            <div class="attendance-stats">
+                <div class="stat-card card-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>نسبة الحضور</h3>
+                        <p id="attendancePercentage">0%</p>
+                        <div class="attendance-progress">
+                            <div class="attendance-progress-fill" id="attendanceProgress"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card card-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الحاضرون</h3>
+                        <p id="totalAttendance">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card card-danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الغائبون</h3>
+                        <p id="totalAbsence">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card card-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>المتأخرون</h3>
+                        <p id="totalLate">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول الحضور -->
+            <div class="attendance-table-container">
+                <div class="table-container">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الطفل</th>
+                                <th>الفصل</th>
+                                <th>حالة الحضور</th>
+                                <th>وقت الحضور</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <!-- سيتم ملؤها بالبيانات -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- أطفال الفصل المحدد -->
+            <div class="dashboard-section">
+                <h3 class="section-title"><i class="fas fa-users"></i> تسجيل الحضور</h3>
+                <div class="attendance-cards" id="attendanceCardsContainer">
+                    <!-- سيتم ملؤها بالبيانات -->
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الحصص -->
+        <section id="lessons" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-book-open"></i> إدارة الحصص والواجبات</h2>
+                <button class="btn btn-success" onclick="openAddLessonModal()">
+                    <i class="fas fa-plus-circle"></i> إضافة حصة جديدة
+                </button>
+            </div>
+
+            <!-- فلترة الحصص -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <input type="text" id="searchLessons" placeholder="بحث عن حصة..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <select id="lessonClassFilter" class="filter-select">
+                    <option value="">جميع الفصول</option>
+                    <option value="الروضة الأولى">الروضة الأولى</option>
+                    <option value="الروضة الثانية">الروضة الثانية</option>
+                    <option value="التمهيدي">التمهيدي</option>
+                </select>
+                <select id="lessonSubjectFilter" class="filter-select">
+                    <option value="">جميع المواد</option>
+                    <option value="اللغة العربية">اللغة العربية</option>
+                    <option value="الرياضيات">الرياضيات</option>
+                    <option value="العلوم">العلوم</option>
+                    <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                </select>
+            </div>
+
+            <!-- شبكة الحصص -->
+            <div class="lessons-grid" id="lessonsGridContainer">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+        </section>
+
+        <!-- قسم المعلمين -->
+        <section id="teachers" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chalkboard-teacher"></i> إدارة المعلمين</h2>
+                <button class="btn btn-success" onclick="openAddTeacherModal()">
+                    <i class="fas fa-plus-circle"></i> إضافة معلم جديد
+                </button>
+            </div>
+
+            <!-- فلترة المعلمين -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <input type="text" id="searchTeachers" placeholder="بحث عن معلم..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+
+            <!-- شبكة المعلمين -->
+            <div class="teachers-grid" id="teachersGridContainer">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+        </section>
+
+        <!-- قسم التقارير -->
+        <section id="reports" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> التقارير والإحصائيات</h2>
+                <div class="report-controls">
+                    <select id="reportType" class="filter-select">
+                        <option value="attendance">تقرير الحضور</option>
+                        <option value="performance">تقرير الأداء</option>
+                        <option value="academic">تقرير أكاديمي</option>
+                        <option value="financial">تقرير مالي</option>
+                    </select>
+                    <input type="month" id="reportMonth" class="date-input">
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        <i class="fas fa-download"></i> تصدير تقرير
+                    </button>
+                </div>
+            </div>
+
+            <!-- الرسوم البيانية -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h4>نسب الحضور الشهرية</h4>
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>توزيع الأطفال على الفصول</h4>
+                    <canvas id="classesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>نسب الأنشطة</h4>
+                    <canvas id="activitiesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>تقدم الأطفال</h4>
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- تقارير سريعة -->
+            <div class="stats-cards">
+                <div class="stat-card card-info">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>أعلى نسبة حضور</h3>
+                        <p id="highestAttendance">0%</p>
+                    </div>
+                </div>
+                <div class="stat-card card-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>أعلى نسبة غياب</h3>
+                        <p id="highestAbsence">0%</p>
+                    </div>
+                </div>
+                <div class="stat-card card-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>أفضل أداء</h3>
+                        <p id="bestPerformance">غير محدد</p>
+                    </div>
+                </div>
+                <div class="stat-card card-danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>حالات غياب متكررة</h3>
+                        <p id="frequentAbsence">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الفصول -->
+        <section id="classes" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> إدارة الفصول الدراسية</h2>
+                <button class="btn btn-success" onclick="openAddClassModal()">
+                    <i class="fas fa-plus-circle"></i> إضافة فصل جديد
+                </button>
+            </div>
+            <div class="classes-grid" id="classesGridContainer">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+        </section>
+
+        <!-- قسم أولياء الأمور -->
+        <section id="parents" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-user-friends"></i> أولياء الأمور</h2>
+                <button class="btn btn-success" onclick="openAddParentModal()">
+                    <i class="fas fa-plus-circle"></i> إضافة ولي أمر
+                </button>
+            </div>
+            <div class="parents-grid" id="parentsGridContainer">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+        </section>
+
+        <!-- قسم التواصل -->
+        <section id="communications" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-comments"></i> التواصل</h2>
+                <button class="btn btn-success" onclick="openNewMessageModal()">
+                    <i class="fas fa-envelope"></i> رسالة جديدة
+                </button>
+            </div>
+            <div class="communications-container">
+                <div class="messages-list" id="messagesList">
+                    <!-- سيتم ملؤها بالبيانات -->
+                </div>
+                <div class="message-details" id="messageDetails">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h3>اختر رسالة لعرضها</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الإعدادات -->
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> الإعدادات</h2>
+            </div>
+            <div class="settings-container">
+                <div class="settings-card">
+                    <h4><i class="fas fa-bell"></i> الإشعارات</h4>
+                    <div class="setting-item">
+                        <label>إشعارات الحضور اليومي</label>
+                        <label class="switch">
+                            <input type="checkbox" id="dailyAttendanceNotify" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>إشعارات الواجبات</label>
+                        <label class="switch">
+                            <input type="checkbox" id="homeworkNotify" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h4><i class="fas fa-database"></i> النسخ الاحتياطي</h4>
+                    <button class="btn btn-primary btn-block" onclick="exportData()">
+                        <i class="fas fa-download"></i> تصدير البيانات
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="backupDatabase()">
+                        <i class="fas fa-save"></i> نسخ احتياطي
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- النوافذ المنبثقة -->
+    <!-- نافذة إضافة طفل -->
+    <div id="addChildModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> إضافة طفل جديد</h3>
+                <span class="close-modal" onclick="closeModal('addChildModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addChildForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="childName"><i class="fas fa-user"></i> اسم الطفل كامل</label>
+                            <input type="text" id="childName" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="birthDate"><i class="fas fa-birthday-cake"></i> تاريخ الميلاد</label>
+                            <input type="date" id="birthDate" required class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gender"><i class="fas fa-venus-mars"></i> الجنس</label>
+                            <select id="gender" required class="form-input">
+                                <option value="">اختر الجنس</option>
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="className"><i class="fas fa-users"></i> الفصل الدراسي</label>
+                            <select id="className" required class="form-input">
+                                <option value="">اختر الفصل</option>
+                                <!-- سيتم ملؤها بالبيانات -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parentName"><i class="fas fa-user-friends"></i> اسم ولي الأمر</label>
+                        <input type="text" id="parentName" required class="form-input">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentPhone"><i class="fas fa-phone"></i> هاتف ولي الأمر</label>
+                            <input type="tel" id="parentPhone" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="parentEmail"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                            <input type="email" id="parentEmail" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emergencyContact"><i class="fas fa-ambulance"></i> جهة اتصال طوارئ</label>
+                        <input type="text" id="emergencyContact" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="medicalNotes"><i class="fas fa-heartbeat"></i> ملاحظات طبية</label>
+                        <textarea id="medicalNotes" rows="3" class="form-input"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('addChildModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> حفظ الطفل
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة حصة -->
+    <div id="addLessonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-book-medical"></i> إضافة حصة جديدة</h3>
+                <span class="close-modal" onclick="closeModal('addLessonModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addLessonForm">
+                    <div class="form-group">
+                        <label for="lessonTitle">عنوان الحصة</label>
+                        <input type="text" id="lessonTitle" required class="form-input">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lessonSubject">المادة</label>
+                            <select id="lessonSubject" required class="form-input">
+                                <option value="">اختر المادة</option>
+                                <option value="اللغة العربية">اللغة العربية</option>
+                                <option value="الرياضيات">الرياضيات</option>
+                                <option value="العلوم">العلوم</option>
+                                <option value="اللغة الإنجليزية">اللغة الإنجليزية</option>
+                                <option value="التربية الإسلامية">التربية الإسلامية</option>
+                                <option value="التربية الفنية">التربية الفنية</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lessonClass">الفصل</label>
+                            <select id="lessonClass" required class="form-input">
+                                <option value="">اختر الفصل</option>
+                                <!-- سيتم ملؤها بالبيانات -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lessonDate">تاريخ الحصة</label>
+                            <input type="date" id="lessonDate" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="lessonTime">وقت الحصة</label>
+                            <input type="time" id="lessonTime" required class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lessonDescription">وصف الحصة</label>
+                        <textarea id="lessonDescription" rows="4" class="form-input"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lessonHomework">الواجب المنزلي</label>
+                        <textarea id="lessonHomework" rows="3" class="form-input"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="homeworkDueDate">موعد تسليم الواجب</label>
+                        <input type="date" id="homeworkDueDate" class="form-input">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('addLessonModal')">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> حفظ الحصة
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-star"></i> Little Stars</h4>
+                <p>نظام متكامل لإدارة رياض الأطفال</p>
+                <p>نسخة 2.0 - متطور</p>
+            </div>
+            <div class="footer-section">
+                <h4>روابط سريعة</h4>
+                <a href="#dashboard">لوحة التحكم</a>
+                <a href="#children">الأطفال</a>
+                <a href="#attendance">الحضور</a>
+                <a href="#lessons">الحصص</a>
+            </div>
+            <div class="footer-section">
+                <h4>الدعم الفني</h4>
+                <p>للإبلاغ عن مشكلة أو اقتراح تحسين:</p>
+                <p>support@little-stars.com</p>
+                <p>الهاتف: 0123456789</p>
+            </div>
+            <div class="footer-section">
+                <h4>تابعنا</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 نظام إدارة رياض الأطفال. جميع الحقوق محفوظة.</p>
+            <p class="version">الإصدار 2.0.0 | آخر تحديث: <span id="lastUpdate"></span></p>
+        </div>
+    </footer>
+
+    <!-- مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- مكتبة الرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ملفات النظام -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
